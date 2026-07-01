@@ -1,1 +1,541 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titan — Équipe de développement logiciel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a;
+    --bg-soft:#1b1e24;
+    --surface:#1f232b;
+    --surface-2:#262b34;
+    --border:rgba(241,237,230,0.09);
+    --border-strong:rgba(241,237,230,0.16);
+    --text:#f1ede6;
+    --text-dim:#9aa0aa;
+    --text-faint:#666c76;
+    --accent:#c77b3e;
+    --accent-soft:rgba(199,123,62,0.14);
+    --diff-add:#5fae8e;
+    --diff-remove:#c0645b;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    line-height:1.05;
+    letter-spacing:-0.01em;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  a{color:inherit; text-decoration:none;}
+
+  img,svg{display:block; max-width:100%;}
+
+  .wrap{
+    max-width:1140px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  section{ padding:120px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px; height:7px;
+    background:var(--accent);
+    border-radius:50%;
+    flex:none;
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{ opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    backdrop-filter:blur(10px);
+    background:rgba(20,22,26,0.78);
+    border-bottom:1px solid var(--border);
+  }
+  nav{
+    max-width:1140px; margin:0 auto; padding:0 28px;
+    height:72px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:20px;
+    letter-spacing:0.02em;
+    display:flex; align-items:center; gap:9px;
+  }
+  .brand .dot{ width:8px; height:8px; background:var(--accent); border-radius:50%; }
+  .nav-links{ display:flex; align-items:center; gap:36px; }
+  .nav-links a{
+    font-size:14.5px; color:var(--text-dim);
+    transition:color 0.2s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{ color:var(--text); }
+  .nav-cta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    border:1px solid var(--border-strong);
+    padding:9px 16px;
+    border-radius:7px;
+    display:flex; align-items:center; gap:8px;
+    transition:border-color 0.2s ease, background 0.2s ease;
+  }
+  .nav-cta:hover, .nav-cta:focus-visible{ border-color:var(--accent); background:var(--accent-soft); }
+  .nav-toggle{ display:none; background:none; border:none; color:var(--text); font-size:22px; cursor:pointer; }
+
+  @media (max-width:820px){
+    .nav-links{
+      position:absolute; top:72px; left:0; right:0;
+      background:var(--bg-soft);
+      flex-direction:column; align-items:flex-start;
+      padding:20px 28px 28px;
+      border-bottom:1px solid var(--border);
+      gap:18px;
+      transform:translateY(-110%);
+      transition:transform 0.3s ease;
+    }
+    .nav-links.open{ transform:translateY(0); }
+    .nav-cta{ order:5; }
+    .nav-toggle{ display:block; }
+  }
+
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:172px 0 110px;
+    border-bottom:1px solid var(--border);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:64px;
+    align-items:center;
+  }
+  .hero h1{
+    font-size:clamp(52px, 8vw, 104px);
+    text-transform:uppercase;
+  }
+  .hero-lede{
+    font-size:19px;
+    color:var(--text-dim);
+    max-width:46ch;
+    margin:26px 0 16px;
+  }
+  .hero-sub{
+    font-size:15.5px;
+    color:var(--text-faint);
+    max-width:50ch;
+    margin-bottom:38px;
+  }
+  .btn-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 22px;
+    border-radius:8px;
+    font-size:14.5px; font-weight:500;
+    transition:transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-primary{ background:var(--accent); color:#16130f; font-weight:600; }
+  .btn-primary:hover{ transform:translateY(-2px); }
+  .btn-ghost{ border:1px solid var(--border-strong); color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--accent); background:var(--accent-soft); transform:translateY(-2px); }
+
+  /* ---------- terminal ---------- */
+  .terminal{
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -25px rgba(0,0,0,0.6);
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:13px 16px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+  }
+  .term-bar .tdot{ width:10px; height:10px; border-radius:50%; }
+  .term-bar .t1{ background:#c0645b; } .term-bar .t2{ background:#c7a13e; } .term-bar .t3{ background:#5fae8e; }
+  .term-title{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; color:var(--text-faint);
+    margin-left:6px;
+  }
+  .term-body{
+    padding:22px 20px 26px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13.5px;
+    min-height:220px;
+  }
+  .term-body .line{ margin-bottom:9px; white-space:pre-wrap; word-break:break-word; }
+  .term-body .prompt{ color:var(--diff-add); }
+  .term-body .hash{ color:var(--accent); }
+  .term-body .head{ color:var(--text-dim); }
+  .cursor{
+    display:inline-block; width:7px; height:14px; background:var(--accent);
+    vertical-align:middle; animation:blink 1s step-end infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ---------- team ---------- */
+  .section-head{ max-width:640px; margin-bottom:56px; }
+  .section-head h2{ font-size:clamp(30px,4vw,42px); margin-bottom:14px; }
+  .section-head p{ color:var(--text-dim); font-size:16px; }
+
+  .team-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:22px;
+  }
+  .team-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:28px;
+    transition:border-color 0.25s ease, transform 0.25s ease;
+  }
+  .team-card:hover{ border-color:var(--border-strong); transform:translateY(-3px); }
+  .avatar{
+    width:52px; height:52px; border-radius:9px;
+    background:var(--accent-soft);
+    border:1px solid var(--border-strong);
+    color:var(--accent);
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .team-card h3{ font-size:19px; margin-bottom:3px; }
+  .role{ color:var(--text-dim); font-size:14px; margin-bottom:6px; }
+  .handle{ font-family:'JetBrains Mono', monospace; font-size:12.5px; color:var(--accent); margin-bottom:14px; display:inline-block; }
+  .bio{ font-size:14.5px; color:var(--text-dim); margin-bottom:18px; }
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:6px;
+    background:var(--surface-2);
+    color:var(--text-dim);
+    border:1px solid var(--border);
+  }
+
+  /* ---------- projects ---------- */
+  .project-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+  }
+  .project-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:28px;
+    display:flex; flex-direction:column;
+    transition:border-color 0.25s ease, transform 0.25s ease;
+  }
+  .project-card:hover{ border-color:var(--border-strong); transform:translateY(-3px); }
+  .project-card .status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--diff-add);
+    margin-bottom:14px;
+  }
+  .project-card h3{ font-size:21px; margin-bottom:10px; }
+  .project-card p{ color:var(--text-dim); font-size:14.5px; margin-bottom:20px; flex:1; }
+  .project-card .tags{ margin-bottom:18px; }
+  .repo-link{ font-size:13.5px; color:var(--text); display:inline-flex; align-items:center; gap:6px; font-weight:500; }
+  .repo-link svg{ width:14px; height:14px; }
+
+  /* ---------- workflow ---------- */
+  .flow{
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+    overflow-x:auto;
+    padding-bottom:12px;
+  }
+  .flow-step{
+    flex:1 0 150px;
+    position:relative;
+    padding:0 14px 0 0;
+  }
+  .flow-step .track{
+    display:flex; align-items:center; margin-bottom:16px;
+  }
+  .flow-step .node{
+    width:14px; height:14px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--accent);
+    flex:none; z-index:2;
+  }
+  .flow-step .line{
+    height:2px; background:var(--border-strong); flex:1;
+  }
+  .flow-step:last-child .line{ display:none; }
+  .flow-step .num{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-faint); margin-bottom:6px; }
+  .flow-step h4{ font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; }
+  .flow-step p{ font-size:13.5px; color:var(--text-dim); }
+
+  .git-rules{
+    margin-top:64px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+  }
+  .rule-card{
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+  .rule-card .mono{ font-size:12.5px; color:var(--accent); display:block; margin-bottom:10px; }
+  .rule-card p{ font-size:14px; color:var(--text-dim); }
+  .rule-card .diff{ font-family:'JetBrains Mono', monospace; font-size:13px; margin-top:12px; }
+  .diff .add{ color:var(--diff-add); }
+  .diff .rem{ color:var(--diff-remove); }
+
+  /* ---------- contact / footer ---------- */
+  .contact{ text-align:center; padding:130px 0 90px; }
+  .contact h2{ font-size:clamp(30px,5vw,50px); max-width:16ch; margin:0 auto 20px; }
+  .contact p{ color:var(--text-dim); max-width:48ch; margin:0 auto 36px; }
+  .contact .btn-row{ justify-content:center; }
+
+  footer{
+    padding:34px 0;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:12px;
+  }
+  footer p{ font-size:13px; color:var(--text-faint); }
+  footer .mono{ font-size:12px; color:var(--text-faint); }
+
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .team-grid{ grid-template-columns:1fr; }
+    .project-grid{ grid-template-columns:1fr; }
+    .git-rules{ grid-template-columns:1fr; }
+    section{ padding:80px 0; }
+    .hero{ padding:150px 0 70px; }
+    .flow{ flex-direction:column; }
+    .flow-step .line{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="#" class="brand"><span class="dot"></span>TITAN</a>
+    <div class="nav-links" id="navLinks">
+      <a href="#equipe">Équipe</a>
+      <a href="#projets">Projets</a>
+      <a href="#methode">Méthode</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-cta" href="https://github.com/titan-team" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu">☰</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Équipe de 4 développeurs · Solutions logicielles</p>
+      <h1>Titan</h1>
+      <p class="hero-lede">On construit des solutions numériques solides, testées et documentées — du premier commit jusqu'à la mise en production.</p>
+      <p class="hero-sub">Titan est un collectif de quatre développeurs basés à Ouagadougou. On conçoit, on code et on livre ensemble, avec Git comme colonne vertébrale de notre travail.</p>
+      <div class="btn-row">
+        <a href="#projets" class="btn btn-primary">Voir nos projets</a>
+        <a href="https://github.com/titan-team" target="_blank" rel="noopener" class="btn btn-ghost">Suivre sur GitHub</a>
+      </div>
+    </div>
+    <div class="terminal reveal">
+      <div class="term-bar">
+        <span class="tdot t1"></span><span class="tdot t2"></span><span class="tdot t3"></span>
+        <span class="term-title">titan@main — git log</span>
+      </div>
+      <div class="term-body" id="termBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- EQUIPE -->
+<section id="equipe">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">L'équipe</p>
+      <h2>Quatre développeurs, une seule branche principale.</h2>
+      <p>Chacun a son domaine, mais tout le monde relit, teste et valide le travail des autres avant que ça atterrisse sur <span class="mono">main</span>.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="avatar">AK</div>
+        <h3>Amara Kaboré</h3>
+        <p class="role">Lead Backend &amp; Architecture</p>
+        <span class="handle mono">@amara.dev</span>
+        <p class="bio">Conçoit les API et les schémas de données. Garante de la stabilité du service en production.</p>
+        <div class="tags"><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">Docker</span></div>
+      </div>
+      <div class="team-card reveal">
+        <div class="avatar">IO</div>
+        <h3>Ismaël Ouédraogo</h3>
+        <p class="role">Frontend &amp; UX</p>
+        <span class="handle mono">@ismael.ux</span>
+        <p class="bio">Transforme les maquettes en interfaces rapides et accessibles. Obsédé par les détails d'interaction.</p>
+        <div class="tags"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Figma</span></div>
+      </div>
+      <div class="team-card reveal">
+        <div class="avatar">FS</div>
+        <h3>Fatim Sawadogo</h3>
+        <p class="role">DevOps &amp; Infrastructure</p>
+        <span class="handle mono">@fatim.ops</span>
+        <p class="bio">Construit les pipelines CI/CD et surveille tout ce qui tourne. Rien ne se déploie sans elle.</p>
+        <div class="tags"><span class="tag">AWS</span><span class="tag">Kubernetes</span><span class="tag">CI/CD</span></div>
+      </div>
+      <div class="team-card reveal">
+        <div class="avatar">YT</div>
+        <h3>Yannick Traoré</h3>
+        <p class="role">Mobile &amp; IA</p>
+        <span class="handle mono">@yannick.ai</span>
+        <p class="bio">Développe les applications mobiles et les modèles qui les rendent un peu plus intelligentes.</p>
+        <div class="tags"><span class="tag">Flutter</span><span class="tag">Python</span><span class="tag">TensorFlow</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJETS -->
+<section id="projets">
+ 
+</section>
+
+<!-- METHODE -->
+<section id="methode">
+  
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  
+</section>
+
+<footer class="wrap">
+  <p>© 2026 Titan — Équipe de développement logiciel</p>
+  <p class="mono">Construit avec Git, du café, et une bonne dose de rigueur.</p>
+</footer>
+
+<script>
+  // Menu mobile
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // Reveal on scroll
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealEls = document.querySelectorAll('.reveal');
+  if (reduceMotion) {
+    revealEls.forEach(el => el.classList.add('in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+  }
+
+  // Terminal typing effect
+  const termBody = document.getElementById('termBody');
+  const gitLog = [
+    { type:'prompt', text:'$ git log --oneline --graph -5' },
+    { hash:'a3f9c21', head:true, text:'feat(api): endpoint de paiement Faso Pay' },
+    { hash:'7e21b0d', text:'fix(auth): correction du refresh token' },
+    { hash:'1c88f4a', text:'docs: mise à jour du README' },
+    { hash:'9a02e3d', text:'feat(ui): nouveau tableau de bord AgriSense' },
+    { hash:'4f10d76', text:'chore: configuration du pipeline CI/CD' }
+  ];
+
+  function renderLine(item){
+    if (item.type === 'prompt') {
+      return `<span class="prompt">${item.text}</span>`;
+    }
+    const headTag = item.head ? ' <span class="head">(HEAD -> main)</span>' : '';
+    return `* <span class="hash">${item.hash}</span>${headTag} ${item.text}`;
+  }
+
+  function typeTerminal(){
+    termBody.innerHTML = '';
+    let i = 0;
+    function nextLine(){
+      if (i >= gitLog.length) {
+        const cursorLine = document.createElement('div');
+        cursorLine.className = 'line';
+        cursorLine.innerHTML = '<span class="prompt">$</span> <span class="cursor"></span>';
+        termBody.appendChild(cursorLine);
+        return;
+      }
+      const div = document.createElement('div');
+      div.className = 'line';
+      div.innerHTML = renderLine(gitLog[i]);
+      termBody.appendChild(div);
+      i++;
+      setTimeout(nextLine, reduceMotion ? 0 : 260);
+    }
+    nextLine();
+  }
+  typeTerminal();
+</script>
+
+</body>
+</html>
